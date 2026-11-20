@@ -1,4 +1,4 @@
-# byu-schedule
+# spoiler-free-scores
 
 Spoiler-free schedules (BYU football, BYU men's basketball, Utah Jazz). The
 core rule: never expose anything that hints at the score — no scores, no
@@ -35,6 +35,11 @@ desktop), so anything in it, including `.venv/`, is shared.
   two machines don't clobber each other. Set this before any `uv` command
   there: `UV_PROJECT_ENVIRONMENT=$LOCALAPPDATA/venvs/byu-schedule`
 - The desktop also has `uv` and the GitHub CLI (`gh`) installed.
+- The GitHub repo was renamed `byu-schedule` -> `spoiler-free-scores`
+  (2026-11-19). The local folder and Python package keep the old name. On
+  any machine still pointing at the old remote:
+  `git remote set-url origin https://github.com/nedsbreads/spoiler-free-scores.git`
+- In-progress work: moving the site to GitHub Pages. See `PAGES_PLAN.md`.
 
 ## Notifications
 

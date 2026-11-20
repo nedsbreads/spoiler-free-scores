@@ -1,6 +1,6 @@
 {
-  "name": "BYU Schedule",
-  "short_name": "BYU Schedule",
+  "name": "Spoiler-Free Scores",
+  "short_name": "Spoiler-Free Scores",
   "description": "Spoiler-free BYU football, BYU basketball, and Utah Jazz schedules",
   "start_url": "/",
   "display": "standalone",

@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from byu_schedule.espn import DEFAULT_SPORT, SPORTS, Sport, fetch_schedule
 
-app = FastAPI(title="BYU Schedule (Spoiler-Free)")
+app = FastAPI(title="Spoiler-Free Scores")
 app.mount(
     "/static",
     StaticFiles(directory=str(Path(__file__).parent / "static")),

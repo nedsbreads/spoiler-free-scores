@@ -1,4 +1,4 @@
-# byu-schedule
+# spoiler-free-scores
 
 Spoiler-free schedules for BYU football, BYU men's basketball, and the Utah
 Jazz: wins and losses only, no scores. Pulls live data from ESPN's public
