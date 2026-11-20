@@ -41,6 +41,11 @@ for (const type of ['wheel', 'touchmove', 'keydown']) {
   window.addEventListener(type, () => { centerPending = false; }, { passive: true });
 }
 
+// Show the pinned header's divider only once rows are scrolling under it.
+const topbarEl = document.querySelector('.topbar');
+const updateTopbar = () => topbarEl.classList.toggle('stuck', topbarEl.getBoundingClientRect().top <= 0 && scrollY > 0);
+window.addEventListener('scroll', updateTopbar, { passive: true });
+
 // Storage can be unavailable (private mode, blocked site data).
 function storageGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }

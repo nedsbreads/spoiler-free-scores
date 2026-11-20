@@ -21,7 +21,7 @@
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0 auto;
     max-width: 480px;
-    padding: 20px 16px 40px;
+    padding: 12px 16px 40px; /* + the top bar's 8px = 20px above the heading */
     background: #ffffff;
     color: #111111;
   }
@@ -30,6 +30,24 @@
     .game { background: #1a1a1a; border-color: #2a2a2a; }
     .meta { color: #9a9a9a; }
     .badge.upcoming, .badge.tie { background: #333; color: #ddd; }
+  }
+  /* Keeps the team picker on screen while the list scrolls. Spans the
+     full width (cancelling the body's side padding) so rows slide under
+     it cleanly; the divider shows only once something is underneath. */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0 -16px;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px 4px;
+    background: #ffffff;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .topbar.stuck { border-bottom-color: #e0e0e0; }
+  @media (prefers-color-scheme: dark) {
+    .topbar { background: #0b0b0b; }
+    .topbar.stuck { border-bottom-color: #2a2a2a; }
   }
   /* The team picker doubles as the page heading: "BYU Football ⌄". The
      visible text is a span; a transparent <select> covers it, so a tap
@@ -41,7 +59,7 @@
     gap: 10px;
     max-width: calc(100% + 10px);
     box-sizing: border-box;
-    margin: 0 0 4px -10px; /* text lines up with the list below */
+    margin: 0 0 0 -10px; /* text lines up with the list below */
     padding: 4px 12px 4px 10px;
     border: 1px solid transparent;
     border-radius: 8px;
@@ -116,7 +134,9 @@
 </style>
 </head>
 <body>
-  <h1 class="picker"><span class="picker-label" aria-hidden="true">&nbsp;</span><select aria-label="Team"></select></h1>
+  <header class="topbar">
+    <h1 class="picker"><span class="picker-label" aria-hidden="true">&nbsp;</span><select aria-label="Team"></select></h1>
+  </header>
   <p class="subtitle">Spoiler-free results — wins and losses only</p>
   <p class="status" role="status">Loading…</p>
   <div id="games"></div>
