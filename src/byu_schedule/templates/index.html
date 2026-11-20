@@ -112,7 +112,9 @@
       <time class="meta" data-iso="{{ game.date }}"
         {%- if game.time_tbd %} data-tbd{% endif %}>{{ game.date }}</time>
     </div>
-    {% if game.status == "final" %}
+    {% if game.status == "final" and not game.result %}
+      <span class="badge upcoming">Final</span>
+    {% elif game.status == "final" %}
       <span class="badge {{ 'win' if game.result == 'W' else 'loss' }}">{{ game.result }}</span>
     {% elif game.status == "live" %}
       <span class="badge live">

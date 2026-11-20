@@ -81,9 +81,13 @@ def needs_watching(games: list[Game], now: datetime) -> bool:
     for game in games:
         if game.status == "live":
             return True
+        start = datetime.fromisoformat(game.date)
         if game.status == "scheduled":
-            start = datetime.fromisoformat(game.date)
             if now - WATCH_LATE <= start <= now + WATCH_AHEAD:
+                return True
+        if game.status == "final" and game.result is None:
+            # Final but W/L not settled yet: keep polling until it is.
+            if now - WATCH_LATE <= start:
                 return True
     return False
 
@@ -126,7 +130,11 @@ async def check_sport(
             seen["started"].add(game.id)
             save_state(state)
 
-        if game.status == "final" and game.id not in seen["final"]:
+        if (
+            game.status == "final"
+            and game.result is not None  # ESPN hasn't settled W/L yet: retry next poll
+            and game.id not in seen["final"]
+        ):
             verb = "beat" if game.result == "W" else "lost to"
             await notify(
                 client,

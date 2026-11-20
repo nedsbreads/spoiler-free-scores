@@ -164,6 +164,32 @@ def _live_label(sport: Sport, status: dict) -> str | None:
     return sport.period_label(min(period, sport.regulation_periods))
 
 
+def _score(competitor: dict) -> float | None:
+    # Scoreboard feed: "132"; schedule feed: {"value": 132.0, ...}.
+    score = competitor.get("score")
+    if isinstance(score, dict):
+        score = score.get("value")
+    try:
+        return float(score)
+    except (TypeError, ValueError):
+        return None
+
+
+def _result(ours: dict, theirs: dict) -> Literal["W", "L"] | None:
+    """W/L for a finished game, or None if ESPN hasn't settled it yet.
+
+    ESPN flips a game to "post" a moment before it sets the `winner` flags,
+    so a missing flag must not be read as a loss. Fall back to the scores,
+    and if those don't decide it either, report no result yet.
+    """
+    if ours.get("winner") is True or theirs.get("winner") is True:
+        return "W" if ours.get("winner") is True else "L"
+    our_score, their_score = _score(ours), _score(theirs)
+    if our_score is None or their_score is None or our_score == their_score:
+        return None
+    return "W" if our_score > their_score else "L"
+
+
 def _live_fields(sport: Sport, competition: dict) -> dict:
     """Status, result, and live label from an ESPN competition object."""
     status = competition["status"]
@@ -173,9 +199,12 @@ def _live_fields(sport: Sport, competition: dict) -> dict:
         for c in competition["competitors"]
         if c["team"]["abbreviation"] == sport.team_abbr
     )
+    theirs = next(c for c in competition["competitors"] if c is not ours)
     result: Literal["W", "L"] | None = None
     if bucket == "final":
-        result = "W" if ours.get("winner") else "L"
+        # None here means "final, result pending": callers must not treat
+        # it as a loss (the notifier waits; the page shows "Final").
+        result = _result(ours, theirs)
     return {
         "status": bucket,
         "result": result,
