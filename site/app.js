@@ -29,6 +29,17 @@ let loadedAt = 0;
 let loadSeq = 0; // ignores responses for a team no longer shown
 let timer = null;
 let refreshWhenVisible = false;
+// Set when a team is opened: center the "current" game once its list is
+// drawn. Cleared after the first fresh render, or as soon as the user
+// scrolls, so refreshes never move the page out from under them.
+let centerPending = false;
+
+// We position the page ourselves on open; don't let the browser restore
+// an old scroll offset on reload.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+for (const type of ['wheel', 'touchmove', 'keydown']) {
+  window.addEventListener(type, () => { centerPending = false; }, { passive: true });
+}
 
 // Storage can be unavailable (private mode, blocked site data).
 function storageGet(key) {
@@ -134,6 +145,23 @@ function renderGames(games) {
   );
 }
 
+// The game to center on open: a live game if there is one, else the most
+// recent finished game. -1 before the season starts (stay at the top).
+function currentIndex(games) {
+  const live = games.findIndex((g) => g.status === 'live');
+  if (live !== -1) return live;
+  return games.findLastIndex((g) => g.status === 'final');
+}
+
+// Puts the current game mid-screen, so the last couple of results and the
+// next couple of games are visible. Near the top of the list it scrolls
+// only as far as needed (often not at all).
+function centerCurrent(games) {
+  const row = gamesEl.children[currentIndex(games)];
+  if (row) row.scrollIntoView({ block: 'center' });
+  else window.scrollTo(0, 0);
+}
+
 function schedule(fn, ms) {
   clearTimeout(timer);
   timer = setTimeout(fn, ms);
@@ -155,6 +183,10 @@ async function load() {
     if (seq !== loadSeq) return;
     statusEl.textContent = '';
     renderGames(games);
+    if (centerPending) {
+      centerCurrent(games);
+      centerPending = false;
+    }
     saveCache(sport, games);
     loadedAt = Date.now();
     if (games.some((g) => needsLiveCheck(g))) schedule(refresh, LIVE_REFRESH_MS);
@@ -170,13 +202,16 @@ async function load() {
 function show(sport) {
   if (sport !== current) {
     current = sport;
+    centerPending = true;
     const cached = loadCache(sport);
     if (cached) {
       renderGames(cached); // instant; replaced when fresh data arrives
       statusEl.textContent = '';
+      centerCurrent(cached); // fresh data re-centers unless the user scrolls
     } else {
       gamesEl.replaceChildren();
       statusEl.textContent = 'Loading…';
+      window.scrollTo(0, 0);
     }
   }
   storageSet(TEAM_STORAGE_KEY, sport.key);
