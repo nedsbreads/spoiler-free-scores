@@ -1,8 +1,10 @@
 # spoiler-free-scores
 
 Spoiler-free schedules (BYU football, BYU men's basketball, Utah Jazz,
-Kansas City Chiefs, Kansas City Royals). The
-core rule: never expose anything that hints at the score — no scores, no
+Kansas City Chiefs, Kansas City Royals), served as a static site on GitHub
+Pages: https://nedsbreads.github.io/spoiler-free-scores/ (`site/`, deployed
+by `.github/workflows/pages.yml` when `site/` changes), plus push
+notifications from `scripts/notify.py`. The core rule: never expose anything that hints at the score — no scores, no
 game clock, and no overtime period numbers (live display caps at each
 sport's last regulation period; see `Sport.regulation_periods` and
 `_live_label` in `espn.py`). Men's college basketball plays halves, not
@@ -14,23 +16,24 @@ would hint at the score), capped at the 9th. NFL games can tie: result `T`.
 Each followed team is an entry in `site/sports.json`, loaded into `SPORTS`
 (`espn.py`) and by the static site: URL slug,
 ESPN path and team slug/abbreviation (not all teams are BYU), titles,
-period labels, and the env var holding its ntfy topic. The static site
-has a team dropdown (the page heading) and `?team={key}`; with no `?team`
-it shows the last-viewed team (localStorage). The old Render site has a
-tab per sport at `/{key}`. Notifier
+period labels, and the env var holding its ntfy topic (a team whose
+secret isn't set gets no notifications; Chiefs intentionally have none).
+The site has a team dropdown (the page heading) and `?team={key}`; with no
+`?team` it shows the last-viewed team (localStorage). Each team's last
+rendered list is cached in localStorage (`games:{key}`, spoiler-safe
+fields only) and drawn instantly on open, then refreshed. Notifier
 state in `state/notified.json` is keyed by sport; a sport new to the state
 file has its already-started/finished games recorded silently (no flood).
 
 ## Two copies of the ESPN/spoiler rules
 
-The site is moving from Render (FastAPI, `src/byu_schedule/`) to GitHub
-Pages (`site/`, static; see `PAGES_PLAN.md`). The static site's
-`site/espn.js` is a port of `espn.py`; the Python copy stays because the
-notifier uses it. **Any change to ESPN parsing or the spoiler rules must be
+The browser fetches ESPN directly (its feeds allow any origin), so
+`site/espn.js` is a port of `src/byu_schedule/espn.py`, which the notifier
+uses. **Any change to ESPN parsing or the spoiler rules must be
 made in both `espn.py` and `site/espn.js`.** Teams are defined once, in
 `site/sports.json`, which both read. To check the two copies agree, dump
-both copies' Game fields for every team and compare them (done when
-`espn.js` was written: identical for all 122 games).
+both copies' Game fields for every team and compare them (last done 2026-11-19:
+identical for all 5 teams, 301 games).
 
 ESPN returns 403 to user agents containing "HeadlessChrome", so headless
 browser tests must pass a normal `--user-agent`. Real browsers are fine.
@@ -59,7 +62,10 @@ desktop), so anything in it, including `.venv/`, is shared.
   (2026-11-19). The local folder and Python package keep the old name. On
   any machine still pointing at the old remote:
   `git remote set-url origin https://github.com/nedsbreads/spoiler-free-scores.git`
-- In-progress work: moving the site to GitHub Pages. See `PAGES_PLAN.md`.
+- The site moved from Render (FastAPI) to GitHub Pages on 2026-11-19; the
+  Render service and FastAPI code were removed. The Python package is now
+  just the notifier's ESPN code (`espn.py`), with `httpx` its only
+  dependency.
 
 ## Notifications
 

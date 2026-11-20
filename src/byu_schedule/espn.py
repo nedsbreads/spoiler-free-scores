@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import time
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -82,10 +81,6 @@ SPORTS: dict[str, Sport] = _load_sports()
 # ESPN's team schedule only returns one season type per request, and the
 # default excludes the postseason (bowl games, March Madness, NBA playoffs).
 _SEASON_TYPES = (2, 3)  # regular season, postseason
-DEFAULT_SPORT = SPORTS["football"]
-
-_CACHE_TTL_SECONDS = 10
-_cache: dict[str, tuple[float, list["Game"]]] = {}
 
 # A scheduled game is checked against the live feed from shortly before its
 # listed start until this long after (covers TBD placeholders and delays).
@@ -224,11 +219,7 @@ async def _get_schedule(
     return response.json().get("events", [])
 
 
-async def fetch_schedule(sport: Sport = DEFAULT_SPORT) -> list[Game]:
-    cached = _cache.get(sport.key)
-    if cached and time.monotonic() - cached[0] < _CACHE_TTL_SECONDS:
-        return cached[1]
-
+async def fetch_schedule(sport: Sport) -> list[Game]:
     async with httpx.AsyncClient(timeout=10) as client:
         regular, post = await asyncio.gather(
             *(_get_schedule(client, sport, t) for t in _SEASON_TYPES),
@@ -282,5 +273,4 @@ async def fetch_schedule(sport: Sport = DEFAULT_SPORT) -> list[Game]:
             if isinstance(result, Exception):
                 feed_comparison[sport.key].append(f"{game.id} live feed failed: {result!r}")
 
-    _cache[sport.key] = (time.monotonic(), games)
     return games
