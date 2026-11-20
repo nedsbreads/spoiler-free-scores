@@ -1,6 +1,8 @@
 // Draws the spoiler-free schedule. Data comes from espn.js; this file only
 // renders the spoiler-safe Game fields (never anything else from ESPN).
-import { fetchSchedule, needsLiveCheck, versus } from './espn.js';
+// ?v=__VERSION__ is replaced with the commit at deploy (pages.yml), so a
+// new page never runs against cached files from an older deploy.
+import { fetchSchedule, needsLiveCheck, versus } from './espn.js?v=__VERSION__';
 
 // While a game is live or about to start, refetch this often (when visible).
 const LIVE_REFRESH_MS = 30 * 1000;
@@ -315,7 +317,7 @@ window.addEventListener('popstate', () => show(teamFromUrl()));
 
 async function start() {
   try {
-    const response = await fetch('sports.json');
+    const response = await fetch('sports.json?v=__VERSION__');
     sports = await response.json();
   } catch (err) {
     console.warn('sports.json failed', err);

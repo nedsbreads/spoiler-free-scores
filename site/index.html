@@ -9,8 +9,8 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32">
 <link rel="icon" href="favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="modulepreload" href="espn.js">
-<link rel="preload" href="sports.json" as="fetch" crossorigin>
+<link rel="modulepreload" href="espn.js?v=__VERSION__">
+<link rel="preload" href="sports.json?v=__VERSION__" as="fetch" crossorigin>
 <meta name="theme-color" content="#002E5D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -198,6 +198,6 @@
   <p class="status" role="status">Loading…</p>
   <div id="games"></div>
   <noscript>This page needs JavaScript to load the schedule.</noscript>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=__VERSION__"></script>
 </body>
 </html>

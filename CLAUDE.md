@@ -39,6 +39,12 @@ made in both `espn.py` and `site/espn.js`.** Teams are defined once, in
 both copies' Game fields for every team and compare them (last done 2026-11-19:
 identical for all 5 teams, 301 games).
 
+Script/data URLs in `site/` carry `?v=__VERSION__`, which `pages.yml`
+replaces with the commit SHA at deploy. Keep it on any new script or
+data file: Pages sends max-age=600, and a new `index.html` running a
+cached old `app.js` once left the site stuck on "Loading…".
+Served locally, the literal `__VERSION__` works fine.
+
 ESPN returns 403 to user agents containing "HeadlessChrome", so headless
 browser tests must pass a normal `--user-agent`. Real browsers are fine.
 Test the site locally with `uv run python -m http.server --directory site`.
