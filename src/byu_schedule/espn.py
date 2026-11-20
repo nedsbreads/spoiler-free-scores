@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import json
 from pathlib import Path
 from dataclasses import dataclass
@@ -18,7 +19,6 @@ class Sport:
 
     key: str  # URL slug and state key
     title: str  # page heading, e.g. "BYU Football"
-    tab_label: str
     espn_path: str
     team_slug: str  # ESPN team URL slug, e.g. "byu", "utah"
     team_abbr: str  # ESPN abbreviation identifying our team in a game
@@ -68,11 +68,17 @@ _PERIOD_LABELS: dict[str, Callable[[int], str]] = {
 SPORTS_JSON = Path(__file__).resolve().parents[2] / "site" / "sports.json"
 
 
+_SPORT_FIELDS = {f.name for f in dataclasses.fields(Sport)} - {"period_label"}
+
+
 def _load_sports() -> dict[str, Sport]:
     sports: dict[str, Sport] = {}
     for entry in json.loads(SPORTS_JSON.read_text(encoding="utf-8")):
-        style = entry.pop("period_style")
-        sports[entry["key"]] = Sport(**entry, period_label=_PERIOD_LABELS[style])
+        # sports.json also holds site-only settings (e.g. "logo"); keep
+        # just the fields Sport defines.
+        fields = {k: v for k, v in entry.items() if k in _SPORT_FIELDS}
+        label = _PERIOD_LABELS[entry["period_style"]]
+        sports[entry["key"]] = Sport(**fields, period_label=label)
     return sports
 
 

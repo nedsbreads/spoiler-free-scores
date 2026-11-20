@@ -2,7 +2,7 @@
   {
     "key": "football",
     "title": "BYU Football",
-    "tab_label": "BYU Football",
+    "logo": "byu",
     "espn_path": "football/college-football",
     "team_slug": "byu",
     "team_abbr": "BYU",
@@ -14,8 +14,8 @@
   },
   {
     "key": "mens-basketball",
-    "title": "BYU Men's Basketball",
-    "tab_label": "BYU Basketball",
+    "title": "BYU Basketball",
+    "logo": "byu",
     "espn_path": "basketball/mens-college-basketball",
     "team_slug": "byu",
     "team_abbr": "BYU",
@@ -28,7 +28,7 @@
   {
     "key": "jazz",
     "title": "Utah Jazz",
-    "tab_label": "Utah Jazz",
+    "logo": "jazz",
     "espn_path": "basketball/nba",
     "team_slug": "utah",
     "team_abbr": "UTAH",
@@ -39,22 +39,9 @@
     "ntfy_env": "NTFY_TOPIC_JAZZ"
   },
   {
-    "key": "chiefs",
-    "title": "Kansas City Chiefs",
-    "tab_label": "Chiefs",
-    "espn_path": "football/nfl",
-    "team_slug": "kc",
-    "team_abbr": "KC",
-    "team_name": "Chiefs",
-    "regulation_periods": 4,
-    "period_style": "quarters",
-    "start_word": "kickoff",
-    "ntfy_env": "NTFY_TOPIC_CHIEFS"
-  },
-  {
     "key": "royals",
     "title": "Kansas City Royals",
-    "tab_label": "Royals",
+    "logo": "royals",
     "espn_path": "baseball/mlb",
     "team_slug": "kc",
     "team_abbr": "KC",
@@ -63,5 +50,18 @@
     "period_style": "innings",
     "start_word": "first pitch",
     "ntfy_env": "NTFY_TOPIC_ROYALS"
+  },
+  {
+    "key": "chiefs",
+    "title": "Kansas City Chiefs",
+    "logo": "chiefs",
+    "espn_path": "football/nfl",
+    "team_slug": "kc",
+    "team_abbr": "KC",
+    "team_name": "Chiefs",
+    "regulation_periods": 4,
+    "period_style": "quarters",
+    "start_word": "kickoff",
+    "ntfy_env": "NTFY_TOPIC_CHIEFS"
   }
 ]

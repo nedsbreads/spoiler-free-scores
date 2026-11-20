@@ -11,7 +11,7 @@ only, never scores. Uses ESPN's public API (no key required).
 A static page on GitHub Pages. The browser fetches each team's schedule
 straight from ESPN, so there's no server to wake up.
 
-- Pick a team from the dropdown in the heading, or link to one with
+- Pick a team from the menu in the heading (with team logos), or link to one with
   `?team=jazz`. With no `?team`, the page opens on the last team viewed.
 - Teams are defined in `site/sports.json`: ESPN path, team slug and
   abbreviation, display names, and how periods are labeled.

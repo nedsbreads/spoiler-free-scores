@@ -18,7 +18,11 @@ Each followed team is an entry in `site/sports.json`, loaded into `SPORTS`
 ESPN path and team slug/abbreviation (not all teams are BYU), titles,
 period labels, and the env var holding its ntfy topic (a team whose
 secret isn't set gets no notifications; Chiefs intentionally have none).
-The site has a team dropdown (the page heading) and `?team={key}`; with no
+The site has a team menu (the page heading; a custom listbox, not a
+`<select>`, so it can show logos) and `?team={key}`. Logos are
+`site/logos/{logo}.png` and `{logo}-dark.png` (ESPN's dark-background
+version, used in dark mode), 96px, named by each team's `logo` in
+`sports.json`. `espn.py` ignores site-only keys like `logo`; with no
 `?team` it shows the last-viewed team (localStorage). Each team's last
 rendered list is cached in localStorage (`games:{key}`, spoiler-safe
 fields only) and drawn instantly on open, then refreshed. Notifier

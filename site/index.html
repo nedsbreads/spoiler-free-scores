@@ -49,21 +49,25 @@
     .topbar { background: #0b0b0b; }
     .topbar.stuck { border-bottom-color: #2a2a2a; }
   }
-  /* The team picker doubles as the page heading: "BYU Football ⌄". The
-     visible text is a span; a transparent <select> covers it, so a tap
-     opens the phone's native picker while the heading sizes to its text. */
+  /* The team picker doubles as the page heading: "[logo] BYU Football ⌄".
+     It's a custom menu rather than a <select>, because native pickers
+     (e.g. the iPhone's wheel) can only show text, not logos. */
+  .picker-heading { margin: 0; font-size: 1.3rem; }
   .picker {
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    max-width: calc(100% + 10px);
+    max-width: calc(100% + 8px);
     box-sizing: border-box;
-    margin: 0 0 0 -10px; /* text lines up with the list below */
-    padding: 4px 12px 4px 10px;
+    margin: 0 0 0 -8px; /* logo lines up with the list below */
+    padding: 4px 12px 4px 8px;
     border: 1px solid transparent;
     border-radius: 8px;
-    font-size: 1.3rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .picker-label {
     min-width: 0;
@@ -81,19 +85,67 @@
     border-right: 2.5px solid currentColor;
     border-bottom: 2.5px solid currentColor;
     transform: rotate(45deg);
+    transition: transform 0.15s;
   }
-  .picker select {
+  .picker[aria-expanded="true"]::after { transform: translateY(4px) rotate(-135deg); }
+  .picker:hover, .picker:focus-visible, .picker[aria-expanded="true"] {
+    background: #f0f0f0;
+    border-color: #e0e0e0;
+    outline: none;
+  }
+  .logo-slot, .menu picture { display: flex; flex-shrink: 0; }
+  .logo { width: 28px; height: 28px; object-fit: contain; }
+  .menu {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    font-size: 16px; /* below 16px, iOS zooms the page on tap */
+    top: calc(100% - 2px);
+    left: 8px;
+    min-width: 250px;
+    max-width: calc(100% - 16px);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    z-index: 2;
   }
-  .picker:hover, .picker:focus-within { background: #f0f0f0; border-color: #e0e0e0; }
+  .menu[hidden] { display: none; }
+  .menu li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px; /* comfortable tap target */
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .menu li:hover, .menu li:focus-visible { background: #f0f0f0; }
+  .menu li[aria-selected="true"] { background: #e8eef7; }
+  .menu li[aria-selected="true"]::after {
+    /* checkmark */
+    content: "";
+    width: 6px;
+    height: 12px;
+    margin: 0 4px 3px auto;
+    border-right: 2.5px solid #002E5D;
+    border-bottom: 2.5px solid #002E5D;
+    transform: rotate(45deg);
+  }
   @media (prefers-color-scheme: dark) {
-    .picker:hover, .picker:focus-within { background: #1a1a1a; border-color: #2a2a2a; }
+    .picker:hover, .picker:focus-visible, .picker[aria-expanded="true"] {
+      background: #1a1a1a;
+      border-color: #2a2a2a;
+    }
+    .menu { background: #1a1a1a; border-color: #2a2a2a; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+    .menu li:hover, .menu li:focus-visible { background: #262626; }
+    .menu li[aria-selected="true"] { background: #1f2f45; }
+    .menu li[aria-selected="true"]::after { border-color: #9cc0ee; }
   }
   .subtitle {
     font-size: 0.85rem;
@@ -135,7 +187,12 @@
 </head>
 <body>
   <header class="topbar">
-    <h1 class="picker"><span class="picker-label" aria-hidden="true">&nbsp;</span><select aria-label="Team"></select></h1>
+    <h1 class="picker-heading">
+      <button class="picker" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-menu">
+        <span class="logo-slot"></span><span class="picker-label">&nbsp;</span>
+      </button>
+    </h1>
+    <ul id="team-menu" class="menu" role="listbox" aria-label="Team" hidden></ul>
   </header>
   <p class="subtitle">Spoiler-free results — wins and losses only</p>
   <p class="status" role="status">Loading…</p>

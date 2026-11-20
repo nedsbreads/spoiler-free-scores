@@ -18,8 +18,10 @@ const CACHED_FIELDS = [
   'id', 'date', 'opponent', 'homeAway', 'neutral', 'timeTbd', 'status', 'result', 'liveLabel',
 ];
 
-const pickerEl = document.querySelector('.picker select');
+const pickerEl = document.querySelector('.picker');
 const pickerLabelEl = document.querySelector('.picker-label');
+const pickerLogoEl = document.querySelector('.logo-slot');
+const menuEl = document.getElementById('team-menu');
 const statusEl = document.querySelector('.status');
 const gamesEl = document.getElementById('games');
 
@@ -62,17 +64,94 @@ function teamFromUrl() {
   return byKey(key) ?? byKey(storageGet(TEAM_STORAGE_KEY)) ?? sports[0];
 }
 
+// Team logo, swapping to ESPN's dark-background version in dark mode.
+function logoEl(sport) {
+  const picture = document.createElement('picture');
+  const dark = document.createElement('source');
+  dark.media = '(prefers-color-scheme: dark)';
+  dark.srcset = `logos/${sport.logo}-dark.png`;
+  const img = new Image(28, 28);
+  img.className = 'logo';
+  img.alt = '';
+  img.src = `logos/${sport.logo}.png`;
+  picture.append(dark, img);
+  return picture;
+}
+
+// --- Team menu: a listbox under the heading button ---------------------
+
 function renderPicker() {
-  pickerEl.replaceChildren(
-    ...sports.map((s) => new Option(s.title, s.key, false, s === current)),
+  pickerLabelEl.textContent = current.title;
+  pickerLogoEl.replaceChildren(logoEl(current));
+  menuEl.replaceChildren(
+    ...sports.map((s) => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.tabIndex = -1;
+      li.dataset.key = s.key;
+      li.setAttribute('aria-selected', String(s === current));
+      const label = document.createElement('span');
+      label.textContent = s.title;
+      li.append(logoEl(s), label);
+      return li;
+    }),
   );
 }
 
-pickerEl.addEventListener('change', () => {
-  const sport = byKey(pickerEl.value);
+const menuOpen = () => !menuEl.hidden;
+const options = () => [...menuEl.children];
+
+function openMenu() {
+  menuEl.hidden = false;
+  pickerEl.setAttribute('aria-expanded', 'true');
+  (options().find((li) => li.dataset.key === current.key) ?? options()[0])?.focus();
+}
+
+function closeMenu({ focusButton = false } = {}) {
+  if (!menuOpen()) return;
+  menuEl.hidden = true;
+  pickerEl.setAttribute('aria-expanded', 'false');
+  if (focusButton) pickerEl.focus();
+}
+
+function choose(key) {
+  closeMenu({ focusButton: true });
+  const sport = byKey(key);
   if (!sport || sport === current) return;
   history.pushState(null, '', `?team=${encodeURIComponent(sport.key)}`);
   show(sport);
+}
+
+pickerEl.addEventListener('click', () => (menuOpen() ? closeMenu() : openMenu()));
+pickerEl.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    openMenu();
+  }
+});
+menuEl.addEventListener('click', (e) => {
+  const li = e.target.closest('li');
+  if (li) choose(li.dataset.key);
+});
+menuEl.addEventListener('keydown', (e) => {
+  const items = options();
+  const i = items.indexOf(document.activeElement);
+  const move = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: items.length - 1 }[e.key];
+  if (move !== undefined) {
+    e.preventDefault();
+    items[Math.max(0, Math.min(items.length - 1, move))].focus();
+  } else if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    if (i !== -1) choose(items[i].dataset.key);
+  } else if (e.key === 'Escape') {
+    closeMenu({ focusButton: true });
+  } else if (e.key === 'Tab') {
+    closeMenu();
+  }
+});
+// Tapping anywhere outside the heading or menu closes it.
+document.addEventListener('pointerdown', (e) => {
+  if (menuOpen() && !e.target.closest('.topbar')) closeMenu();
 });
 
 function saveCache(sport, games) {
@@ -221,7 +300,6 @@ function show(sport) {
   }
   storageSet(TEAM_STORAGE_KEY, sport.key);
   document.title = `${sport.title} · Spoiler-Free Scores`;
-  pickerLabelEl.textContent = sport.title;
   renderPicker();
   load();
 }
