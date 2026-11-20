@@ -60,7 +60,7 @@
     max-width: calc(100% + 8px);
     box-sizing: border-box;
     margin: 0 0 0 -8px; /* logo lines up with the list below */
-    padding: 4px 12px 4px 8px;
+    padding: 7px 12px 7px 8px;
     border: 1px solid transparent;
     border-radius: 8px;
     background: transparent;
@@ -94,6 +94,23 @@
     outline: none;
   }
   .logo-slot, .menu picture { display: flex; flex-shrink: 0; }
+  /* Center the heading logo on the capital letters, not the line box
+     (which includes descender room and sits ~4px higher). Baseline
+     alignment puts the logo's bottom on the text baseline; dropping it by
+     half the logo minus half the cap height centers it on the caps. Cap
+     height is ~0.7em in both SF (iPhone) and Segoe UI, so this holds
+     across fonts. */
+  .picker { align-items: baseline; }
+  .picker::after { align-self: center; }
+  .picker .logo-slot {
+    position: relative;
+    top: calc(14px - 0.35em);
+    top: calc(14px - 0.5cap);
+    /* Same amount, so the logo doesn't make the button taller than the
+       text would. */
+    margin-top: calc(0.35em - 14px);
+    margin-top: calc(0.5cap - 14px);
+  }
   .logo { width: 28px; height: 28px; object-fit: contain; }
   .menu {
     position: absolute;
