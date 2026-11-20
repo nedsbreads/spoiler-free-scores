@@ -48,21 +48,21 @@ on github.io can read them directly. No server needed.
 
 No change. It stays in Python and keeps running in Actions.
 
-## Open decisions (recommended defaults in bold)
+## Decisions (2026-11-19)
 
-- Duplicated rules: keep the Python notifier and the JS site as separate
+- Duplicated rules (DECIDED): keep the Python notifier and the JS site as separate
   copies of the ESPN/spoiler rules, **with team definitions moved into one
   shared `sports.json`** and a CLAUDE.md note that rule changes go in both
   places. The alternative is porting the notifier to JS so there's a
   single copy.
-- Instant badges: cache the last-rendered W/L and Upcoming badges in
+- Instant badges (PENDING user decision): cache the last-rendered W/L and Upcoming badges in
   `localStorage` so they paint instantly on open, then refresh. It's
   spoiler-safe because it holds only what the page already shows.
-  Not decided yet.
+  Not built yet.
 
 ## Cut-over
 
-1. Build `site/`. Test locally with `python -m http.server` run in `site/`.
+1. DONE: built `site/` and checked it against the Python output; Pages enabled.
 2. Deploy to Pages and run it alongside Render for a game or two.
 3. On the phone, remove the old home-screen app and add the new URL. The
    address changes, so the old icon won't follow.

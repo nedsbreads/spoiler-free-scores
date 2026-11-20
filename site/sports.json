@@ -1,0 +1,41 @@
+[
+  {
+    "key": "football",
+    "title": "BYU Football",
+    "tab_label": "BYU Football",
+    "espn_path": "football/college-football",
+    "team_slug": "byu",
+    "team_abbr": "BYU",
+    "team_name": "BYU",
+    "regulation_periods": 4,
+    "period_style": "quarters",
+    "start_word": "kickoff",
+    "ntfy_env": "NTFY_TOPIC"
+  },
+  {
+    "key": "mens-basketball",
+    "title": "BYU Men's Basketball",
+    "tab_label": "BYU Basketball",
+    "espn_path": "basketball/mens-college-basketball",
+    "team_slug": "byu",
+    "team_abbr": "BYU",
+    "team_name": "BYU",
+    "regulation_periods": 2,
+    "period_style": "halves",
+    "start_word": "tip-off",
+    "ntfy_env": "NTFY_TOPIC_MBB"
+  },
+  {
+    "key": "jazz",
+    "title": "Utah Jazz",
+    "tab_label": "Utah Jazz",
+    "espn_path": "basketball/nba",
+    "team_slug": "utah",
+    "team_abbr": "UTAH",
+    "team_name": "Jazz",
+    "regulation_periods": 4,
+    "period_style": "quarters",
+    "start_word": "tip-off",
+    "ntfy_env": "NTFY_TOPIC_JAZZ"
+  }
+]

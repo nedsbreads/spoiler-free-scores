@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import time
+from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Literal
@@ -50,50 +52,25 @@ def _halves(p: int) -> str:
     return {1: "1st Half", 2: "2nd Half"}[p]
 
 
-SPORTS: dict[str, Sport] = {
-    s.key: s
-    for s in [
-        Sport(
-            key="football",
-            title="BYU Football",
-            tab_label="BYU Football",
-            espn_path="football/college-football",
-            team_slug="byu",
-            team_abbr="BYU",
-            team_name="BYU",
-            regulation_periods=4,
-            period_label=_quarters,
-            start_word="kickoff",
-            ntfy_env="NTFY_TOPIC",
-        ),
-        Sport(
-            key="mens-basketball",
-            title="BYU Men's Basketball",
-            tab_label="BYU Basketball",
-            espn_path="basketball/mens-college-basketball",
-            team_slug="byu",
-            team_abbr="BYU",
-            team_name="BYU",
-            regulation_periods=2,  # men's college basketball plays halves
-            period_label=_halves,
-            start_word="tip-off",
-            ntfy_env="NTFY_TOPIC_MBB",
-        ),
-        Sport(
-            key="jazz",
-            title="Utah Jazz",
-            tab_label="Utah Jazz",
-            espn_path="basketball/nba",
-            team_slug="utah",
-            team_abbr="UTAH",
-            team_name="Jazz",
-            regulation_periods=4,
-            period_label=_quarters,
-            start_word="tip-off",
-            ntfy_env="NTFY_TOPIC_JAZZ",
-        ),
-    ]
+_PERIOD_LABELS: dict[str, Callable[[int], str]] = {
+    "quarters": _quarters,
+    "halves": _halves,  # men's college basketball plays halves
 }
+
+# Followed teams are defined once in site/sports.json, shared with the
+# static site's espn.js (which also has its own copy of these rules).
+SPORTS_JSON = Path(__file__).resolve().parents[2] / "site" / "sports.json"
+
+
+def _load_sports() -> dict[str, Sport]:
+    sports: dict[str, Sport] = {}
+    for entry in json.loads(SPORTS_JSON.read_text(encoding="utf-8")):
+        style = entry.pop("period_style")
+        sports[entry["key"]] = Sport(**entry, period_label=_PERIOD_LABELS[style])
+    return sports
+
+
+SPORTS: dict[str, Sport] = _load_sports()
 
 # ESPN's team schedule only returns one season type per request, and the
 # default excludes the postseason (bowl games, March Madness, NBA playoffs).

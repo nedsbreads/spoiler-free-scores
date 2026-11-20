@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spoiler-Free Scores</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="modulepreload" href="espn.js">
+<link rel="preload" href="sports.json" as="fetch" crossorigin>
+<meta name="theme-color" content="#002E5D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Spoiler-Free Scores">
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0 auto;
+    max-width: 480px;
+    padding: 20px 16px 40px;
+    background: #ffffff;
+    color: #111111;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0b0b0b; color: #eaeaea; }
+    .game { background: #1a1a1a; border-color: #2a2a2a; }
+    .meta { color: #9a9a9a; }
+    .badge.upcoming { background: #333; color: #ddd; }
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin: 0 0 18px;
+    border-radius: 10px;
+    background: #f0f0f0;
+  }
+  .tabs a {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 7px;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    font-weight: 600;
+    color: #555;
+    text-decoration: none;
+  }
+  .tabs a[aria-current="page"] { background: #002E5D; color: white; }
+  @media (prefers-color-scheme: dark) {
+    .tabs { background: #1a1a1a; }
+    .tabs a { color: #bbb; }
+    .tabs a[aria-current="page"] { background: #1f4f8a; color: white; }
+  }
+  h1 {
+    font-size: 1.3rem;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    color: #777;
+    margin: 0 0 20px;
+  }
+  .game {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+  }
+  .info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .opponent {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta { font-size: 0.85rem; color: #666; }
+  .badge {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+  .badge.win { background: #1c7c3c; color: white; }
+  .badge.loss { background: #b3261e; color: white; }
+  .badge.live { background: #d97706; color: white; }
+  .badge.upcoming { background: #e5e5e5; color: #333; }
+  .status { font-size: 0.9rem; color: #777; margin: 0 0 12px; }
+  .status:empty { display: none; }
+</style>
+</head>
+<body>
+  <nav class="tabs" aria-label="Teams"></nav>
+  <h1>&nbsp;</h1>
+  <p class="subtitle">Spoiler-free results — wins and losses only</p>
+  <p class="status" role="status">Loading…</p>
+  <div id="games"></div>
+  <noscript>This page needs JavaScript to load the schedule.</noscript>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

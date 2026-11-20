@@ -9,12 +9,28 @@ quarters.
 
 ## Sports
 
-Each followed team is a `Sport` entry in `SPORTS` (`espn.py`): URL slug,
+Each followed team is an entry in `site/sports.json`, loaded into `SPORTS`
+(`espn.py`) and by the static site: URL slug,
 ESPN path and team slug/abbreviation (not all teams are BYU), titles,
 period labels, and the env var holding its ntfy topic. The site has a tab
 per sport at `/{key}`; `/` shows the last-viewed team (cookie). Notifier
 state in `state/notified.json` is keyed by sport; a sport new to the state
 file has its already-started/finished games recorded silently (no flood).
+
+## Two copies of the ESPN/spoiler rules
+
+The site is moving from Render (FastAPI, `src/byu_schedule/`) to GitHub
+Pages (`site/`, static; see `PAGES_PLAN.md`). The static site's
+`site/espn.js` is a port of `espn.py`; the Python copy stays because the
+notifier uses it. **Any change to ESPN parsing or the spoiler rules must be
+made in both `espn.py` and `site/espn.js`.** Teams are defined once, in
+`site/sports.json`, which both read. To check the two copies agree, dump
+both copies' Game fields for every team and compare them (done when
+`espn.js` was written: identical for all 122 games).
+
+ESPN returns 403 to user agents containing "HeadlessChrome", so headless
+browser tests must pass a normal `--user-agent`. Real browsers are fine.
+Test the site locally with `uv run python -m http.server --directory site`.
 
 ## Data sources
 
