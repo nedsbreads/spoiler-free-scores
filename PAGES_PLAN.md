@@ -55,10 +55,10 @@ No change. It stays in Python and keeps running in Actions.
   shared `sports.json`** and a CLAUDE.md note that rule changes go in both
   places. The alternative is porting the notifier to JS so there's a
   single copy.
-- Instant badges (PENDING user decision): cache the last-rendered W/L and Upcoming badges in
+- Instant badges (DONE): cache the last-rendered W/L and Upcoming badges in
   `localStorage` so they paint instantly on open, then refresh. It's
   spoiler-safe because it holds only what the page already shows.
-  Not built yet.
+  Built: `games:<team>` keys in localStorage, only the spoiler-safe Game fields.
 
 ## Cut-over
 

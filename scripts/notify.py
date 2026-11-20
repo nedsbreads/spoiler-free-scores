@@ -135,7 +135,7 @@ async def check_sport(
             and game.result is not None  # ESPN hasn't settled W/L yet: retry next poll
             and game.id not in seen["final"]
         ):
-            verb = "beat" if game.result == "W" else "lost to"
+            verb = {"W": "beat", "L": "lost to", "T": "tied"}[game.result]
             await notify(
                 client,
                 sport,

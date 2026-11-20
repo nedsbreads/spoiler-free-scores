@@ -28,39 +28,53 @@
     body { background: #0b0b0b; color: #eaeaea; }
     .game { background: #1a1a1a; border-color: #2a2a2a; }
     .meta { color: #9a9a9a; }
-    .badge.upcoming { background: #333; color: #ddd; }
+    .badge.upcoming, .badge.tie { background: #333; color: #ddd; }
   }
-  .tabs {
-    display: flex;
-    gap: 4px;
-    padding: 4px;
-    margin: 0 0 18px;
-    border-radius: 10px;
-    background: #f0f0f0;
-  }
-  .tabs a {
-    flex: 1 1 0;
-    display: flex;
+  /* The team picker doubles as the page heading: "BYU Football ⌄". The
+     visible text is a span; a transparent <select> covers it, so a tap
+     opens the phone's native picker while the heading sizes to its text. */
+  .picker {
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 8px 4px;
-    border-radius: 7px;
-    font-size: 0.85rem;
-    line-height: 1.2;
-    font-weight: 600;
-    color: #555;
-    text-decoration: none;
-  }
-  .tabs a[aria-current="page"] { background: #002E5D; color: white; }
-  @media (prefers-color-scheme: dark) {
-    .tabs { background: #1a1a1a; }
-    .tabs a { color: #bbb; }
-    .tabs a[aria-current="page"] { background: #1f4f8a; color: white; }
-  }
-  h1 {
+    gap: 10px;
+    max-width: calc(100% + 10px);
+    box-sizing: border-box;
+    margin: 0 0 4px -10px; /* text lines up with the list below */
+    padding: 4px 12px 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
     font-size: 1.3rem;
-    margin: 0 0 4px;
+  }
+  .picker-label {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .picker::after {
+    /* chevron, drawn in the text color so it works in dark mode */
+    content: "";
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    margin-bottom: 5px;
+    border-right: 2.5px solid currentColor;
+    border-bottom: 2.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .picker select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 16px; /* below 16px, iOS zooms the page on tap */
+  }
+  .picker:hover, .picker:focus-within { background: #f0f0f0; border-color: #e0e0e0; }
+  @media (prefers-color-scheme: dark) {
+    .picker:hover, .picker:focus-within { background: #1a1a1a; border-color: #2a2a2a; }
   }
   .subtitle {
     font-size: 0.85rem;
@@ -95,14 +109,13 @@
   .badge.win { background: #1c7c3c; color: white; }
   .badge.loss { background: #b3261e; color: white; }
   .badge.live { background: #d97706; color: white; }
-  .badge.upcoming { background: #e5e5e5; color: #333; }
+  .badge.upcoming, .badge.tie { background: #e5e5e5; color: #333; }
   .status { font-size: 0.9rem; color: #777; margin: 0 0 12px; }
   .status:empty { display: none; }
 </style>
 </head>
 <body>
-  <nav class="tabs" aria-label="Teams"></nav>
-  <h1>&nbsp;</h1>
+  <h1 class="picker"><span class="picker-label" aria-hidden="true">&nbsp;</span><select aria-label="Team"></select></h1>
   <p class="subtitle">Spoiler-free results — wins and losses only</p>
   <p class="status" role="status">Loading…</p>
   <div id="games"></div>

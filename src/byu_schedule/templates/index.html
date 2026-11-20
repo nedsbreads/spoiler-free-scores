@@ -115,7 +115,7 @@
     {% if game.status == "final" and not game.result %}
       <span class="badge upcoming">Final</span>
     {% elif game.status == "final" %}
-      <span class="badge {{ 'win' if game.result == 'W' else 'loss' }}">{{ game.result }}</span>
+      <span class="badge {{ {'W': 'win', 'L': 'loss'}.get(game.result, 'upcoming') }}">{{ game.result }}</span>
     {% elif game.status == "live" %}
       <span class="badge live">
         LIVE

@@ -52,9 +52,16 @@ def _halves(p: int) -> str:
     return {1: "1st Half", 2: "2nd Half"}[p]
 
 
+def _innings(p: int) -> str:
+    # Inning number only, never top/bottom: "Bottom 9th" would reveal the
+    # home team wasn't already ahead.
+    return f"{ {1: '1st', 2: '2nd', 3: '3rd'}.get(p, f'{p}th') } Inning"
+
+
 _PERIOD_LABELS: dict[str, Callable[[int], str]] = {
     "quarters": _quarters,
     "halves": _halves,  # men's college basketball plays halves
+    "innings": _innings,
 }
 
 # Followed teams are defined once in site/sports.json, shared with the
@@ -102,7 +109,7 @@ class Game:
     home_away: str
     neutral: bool
     status: Status
-    result: Literal["W", "L"] | None
+    result: Literal["W", "L", "T"] | None
     # Spoiler-safe progress for live games: "Q3", "2nd Half", "Halftime".
     # Never past the last regulation period; the clock is never exposed.
     live_label: str | None = None
@@ -152,18 +159,21 @@ def _score(competitor: dict) -> float | None:
         return None
 
 
-def _result(ours: dict, theirs: dict) -> Literal["W", "L"] | None:
-    """W/L for a finished game, or None if ESPN hasn't settled it yet.
+def _result(ours: dict, theirs: dict) -> Literal["W", "L", "T"] | None:
+    """W/L/T for a finished game, or None if ESPN hasn't settled it yet.
 
     ESPN flips a game to "post" a moment before it sets the `winner` flags,
     so a missing flag must not be read as a loss. Fall back to the scores,
-    and if those don't decide it either, report no result yet.
+    and if those are missing too, report no result yet. Equal scores with
+    no winner is a tie (NFL games can end tied).
     """
     if ours.get("winner") is True or theirs.get("winner") is True:
         return "W" if ours.get("winner") is True else "L"
     our_score, their_score = _score(ours), _score(theirs)
-    if our_score is None or their_score is None or our_score == their_score:
+    if our_score is None or their_score is None:
         return None
+    if our_score == their_score:
+        return "T"
     return "W" if our_score > their_score else "L"
 
 
@@ -177,7 +187,7 @@ def _live_fields(sport: Sport, competition: dict) -> dict:
         if c["team"]["abbreviation"] == sport.team_abbr
     )
     theirs = next(c for c in competition["competitors"] if c is not ours)
-    result: Literal["W", "L"] | None = None
+    result: Literal["W", "L", "T"] | None = None
     if bucket == "final":
         # None here means "final, result pending": callers must not treat
         # it as a loss (the notifier waits; the page shows "Final").

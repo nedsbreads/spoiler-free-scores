@@ -37,5 +37,31 @@
     "period_style": "quarters",
     "start_word": "tip-off",
     "ntfy_env": "NTFY_TOPIC_JAZZ"
+  },
+  {
+    "key": "chiefs",
+    "title": "Kansas City Chiefs",
+    "tab_label": "Chiefs",
+    "espn_path": "football/nfl",
+    "team_slug": "kc",
+    "team_abbr": "KC",
+    "team_name": "Chiefs",
+    "regulation_periods": 4,
+    "period_style": "quarters",
+    "start_word": "kickoff",
+    "ntfy_env": "NTFY_TOPIC_CHIEFS"
+  },
+  {
+    "key": "royals",
+    "title": "Kansas City Royals",
+    "tab_label": "Royals",
+    "espn_path": "baseball/mlb",
+    "team_slug": "kc",
+    "team_abbr": "KC",
+    "team_name": "Royals",
+    "regulation_periods": 9,
+    "period_style": "innings",
+    "start_word": "first pitch",
+    "ntfy_env": "NTFY_TOPIC_ROYALS"
   }
 ]

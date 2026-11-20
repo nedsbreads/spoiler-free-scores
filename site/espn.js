@@ -21,6 +21,9 @@ const LIVE_CHECK_AFTER_MS = 24 * 60 * 60 * 1000;
 const PERIOD_LABELS = {
   quarters: (p) => `Q${p}`,
   halves: (p) => ({ 1: '1st Half', 2: '2nd Half' })[p],
+  // Inning number only, never top/bottom: "Bottom 9th" would reveal the
+  // home team wasn't already ahead.
+  innings: (p) => `${({ 1: '1st', 2: '2nd', 3: '3rd' })[p] ?? `${p}th`} Inning`,
 };
 
 const scheduleUrl = (sport, seasonType) =>
@@ -58,16 +61,18 @@ function score(competitor) {
   return Number.isFinite(n) ? n : null;
 }
 
-// W/L for a finished game, or null if ESPN hasn't settled it yet. ESPN
+// W/L/T for a finished game, or null if ESPN hasn't settled it yet. ESPN
 // flips a game to "post" a moment before it sets the `winner` flags, so a
-// missing flag must not be read as a loss.
+// missing flag must not be read as a loss. Equal scores with no winner is
+// a tie (NFL games can end tied).
 function result(ours, theirs) {
   if (ours.winner === true || theirs.winner === true) {
     return ours.winner === true ? 'W' : 'L';
   }
   const a = score(ours);
   const b = score(theirs);
-  if (a === null || b === null || a === b) return null;
+  if (a === null || b === null) return null;
+  if (a === b) return 'T';
   return a > b ? 'W' : 'L';
 }
 

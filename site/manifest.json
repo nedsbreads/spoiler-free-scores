@@ -1,7 +1,7 @@
 {
   "name": "Spoiler-Free Scores",
   "short_name": "Spoiler-Free Scores",
-  "description": "Spoiler-free BYU football, BYU basketball, and Utah Jazz schedules",
+  "description": "Spoiler-free schedules and results for your teams",
   "id": "./",
   "start_url": "./",
   "scope": "./",

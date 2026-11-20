@@ -1,19 +1,23 @@
 # spoiler-free-scores
 
-Spoiler-free schedules (BYU football, BYU men's basketball, Utah Jazz). The
+Spoiler-free schedules (BYU football, BYU men's basketball, Utah Jazz,
+Kansas City Chiefs, Kansas City Royals). The
 core rule: never expose anything that hints at the score — no scores, no
 game clock, and no overtime period numbers (live display caps at each
 sport's last regulation period; see `Sport.regulation_periods` and
 `_live_label` in `espn.py`). Men's college basketball plays halves, not
-quarters.
+quarters. Baseball shows the inning number only (never top/bottom, which
+would hint at the score), capped at the 9th. NFL games can tie: result `T`.
 
 ## Sports
 
 Each followed team is an entry in `site/sports.json`, loaded into `SPORTS`
 (`espn.py`) and by the static site: URL slug,
 ESPN path and team slug/abbreviation (not all teams are BYU), titles,
-period labels, and the env var holding its ntfy topic. The site has a tab
-per sport at `/{key}`; `/` shows the last-viewed team (cookie). Notifier
+period labels, and the env var holding its ntfy topic. The static site
+has a team dropdown (the page heading) and `?team={key}`; with no `?team`
+it shows the last-viewed team (localStorage). The old Render site has a
+tab per sport at `/{key}`. Notifier
 state in `state/notified.json` is keyed by sport; a sport new to the state
 file has its already-started/finished games recorded silently (no flood).
 

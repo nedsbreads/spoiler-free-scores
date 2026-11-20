@@ -10,8 +10,16 @@ const STALE_MS = 60 * 1000;
 const RETRY_MS = 30 * 1000;
 const TEAM_STORAGE_KEY = 'team';
 
-const tabsEl = document.querySelector('.tabs');
-const titleEl = document.querySelector('h1');
+// "Instant badges": the last list drawn for each team is saved on this
+// device and drawn immediately on open, then replaced by fresh data. Only
+// the spoiler-safe Game fields below are ever saved.
+const CACHE_PREFIX = 'games:';
+const CACHED_FIELDS = [
+  'id', 'date', 'opponent', 'homeAway', 'neutral', 'timeTbd', 'status', 'result', 'liveLabel',
+];
+
+const pickerEl = document.querySelector('.picker select');
+const pickerLabelEl = document.querySelector('.picker-label');
 const statusEl = document.querySelector('.status');
 const gamesEl = document.getElementById('games');
 
@@ -38,23 +46,31 @@ function teamFromUrl() {
   return byKey(key) ?? byKey(storageGet(TEAM_STORAGE_KEY)) ?? sports[0];
 }
 
-function renderTabs() {
-  tabsEl.replaceChildren(
-    ...sports.map((s) => {
-      const a = document.createElement('a');
-      a.href = `?team=${encodeURIComponent(s.key)}`;
-      a.textContent = s.tab_label;
-      if (s === current) a.setAttribute('aria-current', 'page');
-      a.addEventListener('click', (e) => {
-        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        if (s === current) return;
-        history.pushState(null, '', a.href);
-        show(s);
-      });
-      return a;
-    }),
+function renderPicker() {
+  pickerEl.replaceChildren(
+    ...sports.map((s) => new Option(s.title, s.key, false, s === current)),
   );
+}
+
+pickerEl.addEventListener('change', () => {
+  const sport = byKey(pickerEl.value);
+  if (!sport || sport === current) return;
+  history.pushState(null, '', `?team=${encodeURIComponent(sport.key)}`);
+  show(sport);
+});
+
+function saveCache(sport, games) {
+  const safe = games.map((g) => Object.fromEntries(CACHED_FIELDS.map((f) => [f, g[f]])));
+  storageSet(CACHE_PREFIX + sport.key, JSON.stringify(safe));
+}
+
+function loadCache(sport) {
+  try {
+    const games = JSON.parse(storageGet(CACHE_PREFIX + sport.key));
+    return Array.isArray(games) ? games : null;
+  } catch {
+    return null;
+  }
 }
 
 function formatDate(game) {
@@ -76,7 +92,7 @@ function formatDate(game) {
 function badge(game) {
   const el = document.createElement('span');
   if (game.status === 'final' && game.result) {
-    el.className = `badge ${game.result === 'W' ? 'win' : 'loss'}`;
+    el.className = `badge ${{ W: 'win', L: 'loss', T: 'tie' }[game.result]}`;
     el.textContent = game.result;
   } else if (game.status === 'final') {
     // Over, but ESPN hasn't settled W/L yet: never guess.
@@ -139,6 +155,7 @@ async function load() {
     if (seq !== loadSeq) return;
     statusEl.textContent = '';
     renderGames(games);
+    saveCache(sport, games);
     loadedAt = Date.now();
     if (games.some((g) => needsLiveCheck(g))) schedule(refresh, LIVE_REFRESH_MS);
   } catch (err) {
@@ -153,13 +170,19 @@ async function load() {
 function show(sport) {
   if (sport !== current) {
     current = sport;
-    gamesEl.replaceChildren();
-    statusEl.textContent = 'Loading…';
+    const cached = loadCache(sport);
+    if (cached) {
+      renderGames(cached); // instant; replaced when fresh data arrives
+      statusEl.textContent = '';
+    } else {
+      gamesEl.replaceChildren();
+      statusEl.textContent = 'Loading…';
+    }
   }
   storageSet(TEAM_STORAGE_KEY, sport.key);
   document.title = `${sport.title} · Spoiler-Free Scores`;
-  titleEl.textContent = sport.title;
-  renderTabs();
+  pickerLabelEl.textContent = sport.title;
+  renderPicker();
   load();
 }
 
